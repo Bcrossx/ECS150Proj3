@@ -6,16 +6,17 @@
 #include "thread.h"
 
 struct semaphore {
-	int count = 0;
+	int count;
   queue_t blocked_queue; //add blocked threads to this queue
 };
 
 sem_t sem_create(size_t count)
 {
+	struct semaphore sstruc;
 	enter_critical_section();
 
   sem_t s = (sem_t) malloc(sizeof(struct semaphore)); //allocate semaphore
-	s->count = count; //initialize semaphore
+	s->sstruc.count = sstruc.count; //initialize semaphore
 	blocked_queue = queue_create(); //initialize queue
 
 	exit_critical_section();
@@ -26,6 +27,7 @@ sem_t sem_create(size_t count)
 
 int sem_destroy(sem_t sem)
 {
+	struct semaphore;
   enter_critical_section();
 	if(sem == NULL || blocked_queue != 0) //check if sem is NULL or if other threads
 		return -1;									 //are still in blocked queue
@@ -38,12 +40,13 @@ int sem_destroy(sem_t sem)
 
 int sem_down(sem_t sem)
 {
+	struct semaphore ;
 	pthread_t tid = pthread_self();
   enter_critical_section();
 	if(sem == NULL){
     return -1;
   }
-	if(sem = 0){
+	if(sem == 0){
 		queue_enqueue(blocked_queue,tid); //enqueue
 		thread_block(); //block if no resources
 	}
@@ -55,6 +58,7 @@ int sem_down(sem_t sem)
 
 int sem_up(sem_t sem)
 {
+	struct semaphore;
 	pthread_t tid = pthread_self();
   enter_critical_section();
   if(sem == NULL){
@@ -72,6 +76,7 @@ int sem_up(sem_t sem)
 
 int sem_getvalue(sem_t sem, int *sval)
 {
+	struct semaphore;
   enter_critical_section();
 	if(sem >= 0){
 		*sval = count;
