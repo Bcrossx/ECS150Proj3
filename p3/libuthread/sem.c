@@ -12,12 +12,12 @@ struct semaphore {
 
 sem_t sem_create(size_t count)
 {
-	struct semaphore sstruc;
+	//struct semaphore sstruc;
 	enter_critical_section();
 
   sem_t s = (sem_t) malloc(sizeof(struct semaphore)); //allocate semaphore
-	s->sstruc.count = sstruc.count; //initialize semaphore
-	blocked_queue = queue_create(); //initialize queue
+	s->count = 0; //initialize semaphore
+	s->blocked_queue = queue_create(); //initialize queue
 
 	exit_critical_section();
 
@@ -27,9 +27,8 @@ sem_t sem_create(size_t count)
 
 int sem_destroy(sem_t sem)
 {
-	struct semaphore;
   enter_critical_section();
-	if(sem == NULL || blocked_queue != 0) //check if sem is NULL or if other threads
+	if(sem == NULL || sem->blocked_queue != 0) //check if sem is NULL or if other threads
 		return -1;									 //are still in blocked queue
 
 	free(sem);										 //Deallocate sem
@@ -40,17 +39,16 @@ int sem_destroy(sem_t sem)
 
 int sem_down(sem_t sem)
 {
-	struct semaphore ;
 	pthread_t tid = pthread_self();
   enter_critical_section();
 	if(sem == NULL){
     return -1;
   }
-	if(sem == 0){
-		queue_enqueue(blocked_queue,tid); //enqueue
+	if(sem->count == 0){
+		queue_enqueue(sem->blocked_queue,&tid); //enqueue
 		thread_block(); //block if no resources
 	}
-	count--;
+	sem->count--;
   exit_critical_section();
 
 	return 0;
@@ -58,17 +56,16 @@ int sem_down(sem_t sem)
 
 int sem_up(sem_t sem)
 {
-	struct semaphore;
-	pthread_t tid = pthread_self();
+ 	pthread_t tid = pthread_self();
   enter_critical_section();
   if(sem == NULL){
     return -1;
   }
-	if(sem >= 1){
-		queue_dequeue(blocked_queue, tid);
-		thread_unblock();
+	if(sem->count > 0){
+		queue_dequeue(sem->blocked_queue,(void**) &tid);
+		thread_unblock(tid);
 	}
-	count++;
+	sem->count++;
   exit_critical_section();
 
 	return 0;
@@ -76,18 +73,14 @@ int sem_up(sem_t sem)
 
 int sem_getvalue(sem_t sem, int *sval)
 {
-	struct semaphore;
   enter_critical_section();
 	if(sem >= 0){
-		*sval = count;
+		*sval = sem->count;
 	}
-	if(sem == 0){
-		//assign a negative number
-	  //whose absolute value is the count of
-		//the number of threads currently blocked
-	  //in sem_down().
+	if(sem->count == 0){
+		*sval = -1*sem->count;
 	}
-	if(sem == NULL || *sval == NULL){
+	if(sem == NULL || sval == NULL){
 		return -1;
 	}
 
