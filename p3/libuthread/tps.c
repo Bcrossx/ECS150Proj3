@@ -12,7 +12,10 @@
 #include "thread.h"
 #include "tps.h"
 
-/* TODO: Phase 2 */
+//struc with tps Data
+//queue to the strucs, strucs have their own info (TID,mmap, etc.)
+//Read and write, pthread_self to search through the queue and see if it exists,
+// if not, we need to add a new tps to our queue
 
 int tps_init(int segv)
 {
@@ -21,7 +24,8 @@ int tps_init(int segv)
 
 int tps_create(void)
 {
-	/* TODO: Phase 2 */
+	//thread queue
+  //mmap queue
 }
 
 int tps_destroy(void)
@@ -43,4 +47,3 @@ int tps_clone(pthread_t tid)
 {
 	/* TODO: Phase 2 */
 }
-
