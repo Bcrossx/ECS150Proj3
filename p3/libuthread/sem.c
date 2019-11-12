@@ -45,7 +45,7 @@ int sem_down(sem_t sem)
 	if(sem == NULL){
 		 return -1;
 	}
-	if(sem->count == 0){
+	while(sem->count == 0){
 		queue_enqueue(sem->blocked_queue,&tid); //enqueue
 		thread_block(); //block if no resources
 	}
@@ -57,17 +57,18 @@ int sem_down(sem_t sem)
 
 int sem_up(sem_t sem)
 {
- 	pthread_t tid = pthread_self();
+ 	pthread_t *tid = NULL;
   enter_critical_section();
+	int len = queue_length(sem->blocked_queue);
   if(sem == NULL){
     return -1;
   }
 	sem->count++;
-	if(sem->count > 0){
+	if(len > 0){
 		queue_dequeue(sem->blocked_queue,(void**) &tid);
-		thread_unblock(tid);
+		thread_unblock(*tid);
 	}
-  // exit_critical_section();
+  exit_critical_section();
 
 	return 0;
 }
