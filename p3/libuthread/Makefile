@@ -1,7 +1,7 @@
 # Target library
 lib := libuthread.a
-objs := sem.o
-objs2 := sem.o thread.o queue.o
+objs := sem.o tps.o
+objs2 := sem.o tps.o thread.o queue.o
 
 all: $(lib)
 
@@ -11,8 +11,8 @@ libuthread.a: $(objs)
 sem.o: sem.c
 	cc -c -g -Wall -Werror sem.c
 
-#tps.o: tps.c
-#	cc -c -g -Wall -Werror tps.c
+tps.o: tps.c
+	cc -c -g -Wall -Werror tps.c
 
 clean:
 	rm -f $(lib) $(objs)
