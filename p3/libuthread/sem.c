@@ -23,13 +23,17 @@ sem_t sem_create(size_t count)
 
 	exit_critical_section();
 	//return pointer to initialized semaphore
+	if(!s)
+		return NULL;
+
 	return s;
 }
 
 int sem_destroy(sem_t sem)
 {
   enter_critical_section();
-	if(sem == NULL || sem->blocked_queue != 0) //check if sem is NULL or if other threads
+	int len = queue_length(sem->blocked_queue);
+	if(sem == NULL || len > 0) 		 //check if sem is NULL or if other threads
 		return -1;									 //are still in blocked queue
 
 	free(sem);										 //Deallocate sem
@@ -40,8 +44,8 @@ int sem_destroy(sem_t sem)
 
 int sem_down(sem_t sem)
 {
+	enter_critical_section();
 	pthread_t tid = pthread_self();
-  enter_critical_section();
 	if(sem == NULL){
 		 return -1;
 	}
@@ -57,8 +61,8 @@ int sem_down(sem_t sem)
 
 int sem_up(sem_t sem)
 {
+	enter_critical_section();
  	pthread_t *tid = NULL;
-  enter_critical_section();
 	int len = queue_length(sem->blocked_queue);
   if(sem == NULL){
     return -1;
@@ -76,11 +80,12 @@ int sem_up(sem_t sem)
 int sem_getvalue(sem_t sem, int *sval)
 {
   enter_critical_section();
+	int len = queue_length(sem->blocked_queue);
 	if(sem->count > 0){
 		*sval = sem->count;
 	}
 	if(sem->count == 0){
-		*sval = (-1)*sem->count;
+		*sval = (-1)*len;
 	}
 	if(sem == NULL || sval == NULL){
 		return -1;

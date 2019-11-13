@@ -14,7 +14,7 @@
 #include <sem.h>
 
 #define BUFFER_SIZE	16
-#define MAXCOUNT	1000
+#define MAXCOUNT	100
 
 struct test4 {
 	sem_t empty;
